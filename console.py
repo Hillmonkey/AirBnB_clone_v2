@@ -2,6 +2,7 @@
 """ console """
 
 import cmd
+from copy import deepcopy
 from datetime import datetime
 import models
 from models.amenity import Amenity
@@ -11,11 +12,35 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+import re
 import shlex  # for splitting the line along spaces except in double quotes
 
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
+def is_valid_string(string):
+	''' func: is_valid_string
+	accepts: string (typically a command line arg)
+	desired format: leading, trailing double quotes
+				    all interior double quotes escaped
+					no spaces, underscores substitute for spaces
+	returns: boolean if string matches desired format 
+	'''
+
+    # starts & ends with double quote, no interior spaces
+	test = re.compile('^"[^ ]+"$')
+	# test for all quotes case
+	all_quotes = re.compile('"{3,}')  # 3 or more quotes
+
+	if test.match(string) == None or all_quotes.match(string) != None:
+		return False
+	else:
+		quotes_escpaed = True
+		for char, i in enumerate(string[1:-1]):
+			if char == '"' and string[i - 1] != '\\':
+				quotes_escaped = False
+				break
+		return quotes_escaped
 
 class HBNBCommand(cmd.Cmd):
     """ HBNH console """
@@ -39,11 +64,35 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             print("** class name missing **")
             return False
+
         if args[0] in classes:
             instance = classes[args[0]]()
         else:
             print("** class doesn't exist **")
             return False
+
+	    # here is where we handle passing params for object creation
+		# we will build new list of key-value pairs where all values
+		# values are validated
+		new_args = []
+		if len(args) > 1:
+			for arg in args[1:]:
+				# validation: string, int, or float?
+				if arg[0] = '"':
+					if is_valid_string(arg):
+						new_args.append(converted_string(arg))
+					break
+				if is_valid_integer(arg):  # working with an int
+					# maybe just cast str to int here instead of converted_int
+					new_args.append(converted_int(arg))
+					break
+				if is_valid_float(arg):
+					new_args.append(converted_float(arg))
+
+		# new object has already been created, now we pass new_args into
+		# do_update repeatedly to modify newly created object
+
+
         print(instance.id)
         instance.save()
 

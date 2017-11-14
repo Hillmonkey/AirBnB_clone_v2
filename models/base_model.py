@@ -7,9 +7,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import models
 import uuid
+from os import getenv
 
-
-Base = declarative_base()
+if getenv('HBNB_TYPE_STORAGE') == 'db':
+    Base = declarative_base()
+else:
+    Base = object
 time = "%Y-%m-%dT%H:%M:%S.%f"
 
 
@@ -17,7 +20,7 @@ class BaseModel:
     """The BaseModel class from which future classes will be derived"""
 
     id = Column(String(60), primary_key=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = created_at
 
     def __init__(self, *args, **kwargs):

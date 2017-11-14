@@ -1,7 +1,7 @@
  #!/usr/bin/python
 """ holds class State"""
 from models.base_model import BaseModel, Base
-from models.engine.file_storage import FileStorage
+#from models import storage
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from os import getenv
@@ -19,12 +19,12 @@ class State(BaseModel, Base):
         """initializes state"""
         super().__init__(*args, **kwargs)
 
-    @property
-    def cities(self):
-        """returns Cities instances of current state_id"""
-        cities = []
-        objs = FileStorage.all()
-        for key in objs:
-            if "City" in key and objs[key].state_id == self.id:
-                cities.append(objs[key])
-        return cities
+  #  @property
+   # def cities(self):
+    #    """returns Cities instances of current state_id"""
+     #   cities = []
+    #    objs = FileStorage.all()
+     #   for key in objs:
+      #      if "City" in key and objs[key].state_id == self.id:
+       #         cities.append(objs[key])
+        #return cities

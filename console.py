@@ -19,28 +19,61 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
 def is_valid_string(string):
-	''' func: is_valid_string
-	accepts: string (typically a command line arg)
-	desired format: leading, trailing double quotes
-				    all interior double quotes escaped
-					no spaces, underscores substitute for spaces
-	returns: boolean if string matches desired format 
-	'''
+    ''' func: is_valid_string
+    accepts: string (typically a value from KV pair in command line arg)
+    legal format: leading, trailing double quotes
+                    all interior double quotes escaped
+                    no spaces in string, underscores substitute for spaces
+    returns: boolean if string matches desired format 
+    '''
 
     # starts & ends with double quote, no interior spaces
-	test = re.compile('^"[^ ]+"$')
-	# test for all quotes case
-	all_quotes = re.compile('"{3,}')  # 3 or more quotes
+    test = re.compile('^"[^ ]+"$')
+    # test for all quotes case
+    all_quotes = re.compile('"{3,}')  # 3 or more quotes
 
-	if test.match(string) == None or all_quotes.match(string) != None:
-		return False
-	else:
-		quotes_escpaed = True
-		for char, i in enumerate(string[1:-1]):
-			if char == '"' and string[i - 1] != '\\':
-				quotes_escaped = False
-				break
-		return quotes_escaped
+    if test.match(string) == None or all_quotes.match(string) != None:
+        return False
+    else:  # test that all internal double quotes are preceded by an escape
+        is_validscpaed = True
+        for char, i in enumerate(string[1:-1]):
+            if char == '"' and string[i - 1] != '\\':
+                quotes_escaped = False
+                break
+        return quotes_escaped
+
+def is_valid_integer(string):
+    ''' func: is_valid_integer
+    accepts: string
+    returns: boolean indicating if the string represents an integer
+    ........ leading plus or minus is allowed
+    '''
+    test = re.compile('^[+-]?\d+$')
+    if test.match(string) == None:
+        return False
+    else:
+        return True
+
+def is_valid_float(string):
+    '''func: is_valid_float
+    accepts: string
+    returns: boolean indicating if the string represents a float
+    ...... one or more digits must exist both before and after dot
+    ...... leading plus or minus is allowed
+    '''
+    test = re.compile('^[+-]?\d+\.\d+$')
+    if test.match(string) == None:
+        return False
+    else:
+        return True
+
+def converted_string(string):
+    '''func: converted_string
+    accepts: value in key/value pair where type(value) == str
+             leading and trailing quotes are already validated
+    returns: string with leading and trailing double quotes  stripped off
+    '''
+    return string[1:-1]
 
 class HBNBCommand(cmd.Cmd):
     """ HBNH console """
@@ -71,27 +104,57 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return False
 
-	    # here is where we handle passing params for object creation
-		# we will build new list of key-value pairs where all values
-		# values are validated
-		new_args = []
-		if len(args) > 1:
-			for arg in args[1:]:
-				# validation: string, int, or float?
-				if arg[0] = '"':
-					if is_valid_string(arg):
-						new_args.append(converted_string(arg))
-					break
-				if is_valid_integer(arg):  # working with an int
-					# maybe just cast str to int here instead of converted_int
-					new_args.append(converted_int(arg))
-					break
-				if is_valid_float(arg):
-					new_args.append(converted_float(arg))
+        # here is where we handle passing params for object creation
+        # we will build new list of key-value pairs where all values
+        # values are validated
+        arg_dict = {}
+        print()
+        if len(args) > 1:
+            for arg in args[1:]:
+                # break key/value on equal sign
+                # Key must not contain an equal sign
+                print("DEBUG: {}".format(str(arg)))
+                key_val = arg.split('=')
+                key = key_val[0]
+                print("\tKEY: {}".format(key))
+                val = "".join(key_val[1:])
+                print("\tVALUE: {}".format(val))
 
-		# new object has already been created, now we pass new_args into
-		# do_update repeatedly to modify newly created object
+                #validate key
+                if key.isalpha():
+                    print('\tKEY_IS_ALPHA')
+                else:
+                    continue
 
+                # validate value : string, int, or float?
+                if val[0] == '"' and is_valid_string(val):
+                    print("\t***DBG-valid string")
+                    arg_dict[key] = converted_string(val)
+                    continue
+                if is_valid_integer(val):  # working with an int
+                    # maybe just cast str to int here instead of converted_int
+                    arg_dict[key] = int(val)
+                    print("\t***DBG-valid int")
+                    continue
+                if is_valid_float(val):
+                    # new_args.append(converted_float(val))
+                    arg_dict[key] = float(val)
+                    print("\t***DBG-valid float")
+                    continue
+                print("\tDBG-none of the above")
+                print()
+
+        # new object has already been created, now we pass new_args into
+        # do_update repeatedly to modify newly created object
+        # print("----------DEBUG----------------")
+        # print(arg_dict)
+        # print(args[0])
+        # print(instance.id)
+
+        for KV in arg_dict:
+            #build arg string
+            params = " ".join([args[0], instance.id, KV, str(arg_dict[KV])])
+            self.do_update(params)
 
         print(instance.id)
         instance.save()

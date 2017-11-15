@@ -18,29 +18,66 @@ import shlex  # for splitting the line along spaces except in double quotes
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
-def is_valid_string(string):
+
+def DUD_is_valid_string(string):
     ''' func: is_valid_string
     accepts: string (typically a value from KV pair in command line arg)
     legal format: leading, trailing double quotes
                     all interior double quotes escaped
                     no spaces in string, underscores substitute for spaces
-    returns: boolean if string matches desired format 
+    returns: boolean if string matches desired format
     '''
 
+    print("=========TESTING VALUE STRING================")
+    print("\t string = {}".format(string))
     # starts & ends with double quote, no interior spaces
     test = re.compile('^"[^ ]+"$')
     # test for all quotes case
     all_quotes = re.compile('"{3,}')  # 3 or more quotes
 
-    if test.match(string) == None or all_quotes.match(string) != None:
+    if test.search(string) is not None or\
+            all_quotes.search(string) is not None:
         return False
     else:  # test that all internal double quotes are preceded by an escape
-        is_validscpaed = True
+        quotes_escaped = True
         for char, i in enumerate(string[1:-1]):
             if char == '"' and string[i - 1] != '\\':
                 quotes_escaped = False
                 break
         return quotes_escaped
+
+
+def is_valid_string(string):
+    '''func: is fun
+    '''
+    # it seems that string is passed without surrounding quotes
+    # non-escaped internal quotes need to be tested
+    # no spaces in string
+    print("+++++++++++++ TESTING VALUE STRING +++++++++++++++++")
+    print("\t string = {}".format(string))
+
+    if re.search(' ', string) is not None:
+        return False
+
+    # this doesnt test everything
+    if re.search("[a-zA-Z_]+", string) is not None:
+        return False
+    return True
+
+
+def is_valid_key(string):
+    ''' func: is_valid_key
+    accepts: key
+    ........ not yet testing for edge cases like all underscores, other weird
+    ........ stuff
+    returns: boolean if string only contains alphanumberics
+    ........ and underscores (no spaces)
+    '''
+    if re.search('[a-zA-Z_]+', string) is None:
+        return False
+    else:
+        return True
+
 
 def is_valid_integer(string):
     ''' func: is_valid_integer
@@ -48,11 +85,12 @@ def is_valid_integer(string):
     returns: boolean indicating if the string represents an integer
     ........ leading plus or minus is allowed
     '''
-    test = re.compile('^[+-]?\d+$')
-    if test.match(string) == None:
+    # test = re.compile('^[+-]?\d+$')
+    if re.search('^[+-]?\d+$', string) is None:
         return False
     else:
         return True
+
 
 def is_valid_float(string):
     '''func: is_valid_float
@@ -61,11 +99,12 @@ def is_valid_float(string):
     ...... one or more digits must exist both before and after dot
     ...... leading plus or minus is allowed
     '''
-    test = re.compile('^[+-]?\d+\.\d+$')
-    if test.match(string) == None:
+    # test = re.compile('^[+-]?\d+\.\d+$')
+    if re.search('^[+-]?\d+\.\d+$', string) is None:
         return False
     else:
         return True
+
 
 def converted_string(string):
     '''func: converted_string
@@ -74,6 +113,7 @@ def converted_string(string):
     returns: string with leading and trailing double quotes  stripped off
     '''
     return string[1:-1]
+
 
 class HBNBCommand(cmd.Cmd):
     """ HBNH console """
@@ -120,14 +160,16 @@ class HBNBCommand(cmd.Cmd):
                 val = "".join(key_val[1:])
                 print("\tVALUE: {}".format(val))
 
-                #validate key
-                if key.isalpha():
+                #  validate key
+                if is_valid_key(key):
                     print('\tKEY_IS_ALPHA')
                 else:
+                    print('\tKEY__NOT__ALPHA')
                     continue
 
                 # validate value : string, int, or float?
-                if val[0] == '"' and is_valid_string(val):
+                # if val[0] == '"' and is_valid_string(val):
+                if is_valid_string(val):
                     print("\t***DBG-valid string")
                     arg_dict[key] = converted_string(val)
                     continue
@@ -152,7 +194,7 @@ class HBNBCommand(cmd.Cmd):
         # print(instance.id)
 
         for KV in arg_dict:
-            #build arg string
+            #  build arg string
             params = " ".join([args[0], instance.id, KV, str(arg_dict[KV])])
             self.do_update(params)
 

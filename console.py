@@ -106,14 +106,13 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Creates a new instance of a class"""
+        print(arg)
         args = shlex.split(arg)
+        print("DEBUG:args = {}".format(str(args)))
         if len(args) == 0:
             print("** class name missing **")
             return False
-
-        if args[0] in classes:
-            instance = classes[args[0]]()
-        else:
+        if args[0] not in classes:
             print("** class doesn't exist **")
             return False
 
@@ -121,7 +120,6 @@ class HBNBCommand(cmd.Cmd):
         # we will build new list of key-value pairs where all values
         # values are validated
         arg_dict = {}
-        print()
         if len(args) > 1:
             for arg in args[1:]:
                 # break key/value on equal sign
@@ -139,7 +137,6 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     print('\tKEY__NOT__ALPHA')
                     continue
-
                 if "id" in key:  # all id keys have strings as values
                     arg_dict[key] = val
                     continue
@@ -152,19 +149,12 @@ class HBNBCommand(cmd.Cmd):
                     if is_valid_string(val):  # not a number, valid string?
                         arg_dict[key] = val.replace('_', ' ')
 
-        # new object has already been created, now we pass new_args into
-        # do_update repeatedly to modify newly created object
-
-        for KV in arg_dict:
-            #  build arg string
-            params = " ".join([args[0], instance.id, KV, str(arg_dict[KV])])
-            print("---------PARAMS------------")
-            print(params)
-            print("---------------------------")
-            self.do_update(params)
-
+        print("args[0]: {}".format(args[0]))
+        print("\tDEBUG:arg_dict = {}".format(arg_dict))
+        instance = classes[args[0]](**arg_dict)
         print(instance.id)
         instance.save()
+
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""

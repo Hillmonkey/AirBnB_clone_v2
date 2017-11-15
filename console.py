@@ -19,34 +19,6 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
 
-def DUD_is_valid_string(string):
-    ''' func: is_valid_string
-    accepts: string (typically a value from KV pair in command line arg)
-    legal format: leading, trailing double quotes
-                    all interior double quotes escaped
-                    no spaces in string, underscores substitute for spaces
-    returns: boolean if string matches desired format
-    '''
-
-    print("=========TESTING VALUE STRING================")
-    print("\t string = {}".format(string))
-    # starts & ends with double quote, no interior spaces
-    test = re.compile('^"[^ ]+"$')
-    # test for all quotes case
-    all_quotes = re.compile('"{3,}')  # 3 or more quotes
-
-    if test.search(string) is not None or\
-            all_quotes.search(string) is not None:
-        return False
-    else:  # test that all internal double quotes are preceded by an escape
-        quotes_escaped = True
-        for char, i in enumerate(string[1:-1]):
-            if char == '"' and string[i - 1] != '\\':
-                quotes_escaped = False
-                break
-        return quotes_escaped
-
-
 def is_valid_string(string):
     '''func: is fun
     '''
@@ -55,13 +27,14 @@ def is_valid_string(string):
     # no spaces in string
     print("+++++++++++++ TESTING VALUE STRING +++++++++++++++++")
     print("\t string = {}".format(string))
-
+    '''
     if re.search(' ', string) is not None:
         return False
 
     # this doesnt test everything
     if re.search("[a-zA-Z_]+", string) is not None:
         return False
+    '''
     return True
 
 
@@ -73,37 +46,38 @@ def is_valid_key(string):
     returns: boolean if string only contains alphanumberics
     ........ and underscores (no spaces)
     '''
-    if re.search('[a-zA-Z_]+', string) is None:
-        return False
-    else:
-        return True
+    # if re.search('[a-zA-Z_]+', string) is None:
+    # return False
+    # else:
+    # return True
+    return True
 
 
 def is_valid_integer(string):
     ''' func: is_valid_integer
     accepts: string
     returns: boolean indicating if the string represents an integer
-    ........ leading plus or minus is allowed
+    ........ leading or minus is allowed
     '''
-    # test = re.compile('^[+-]?\d+$')
-    if re.search('^[+-]?\d+$', string) is None:
-        return False
-    else:
+    test_string = string
+    if len(string) > 0 and string[0] == "-":
+        test_string = string.replace('-', '', 1)
+    if test_string.isdigit():
         return True
+    else:
+        return False
 
 
 def is_valid_float(string):
-    '''func: is_valid_float
+    """func: is_valid_float
     accepts: string
-    returns: boolean indicating if the string represents a float
-    ...... one or more digits must exist both before and after dot
-    ...... leading plus or minus is allowed
-    '''
-    # test = re.compile('^[+-]?\d+\.\d+$')
-    if re.search('^[+-]?\d+\.\d+$', string) is None:
-        return False
-    else:
+    ........ test for int first, then for float
+    Return: True is string is a simple float"""
+    try:
+        float(string)
         return True
+    except ValueError:
+        return False
 
 
 def converted_string(string):
@@ -167,35 +141,27 @@ class HBNBCommand(cmd.Cmd):
                     print('\tKEY__NOT__ALPHA')
                     continue
 
-                # validate value : string, int, or float?
-                # if val[0] == '"' and is_valid_string(val):
-                if is_valid_string(val):
-                    print("\t***DBG-valid string")
-                    arg_dict[key] = converted_string(val)
+                if "id" in key:  # all id keys have strings as values
+                    arg_dict[key] = val
                     continue
-                if is_valid_integer(val):  # working with an int
-                    # maybe just cast str to int here instead of converted_int
-                    arg_dict[key] = int(val)
-                    print("\t***DBG-valid int")
-                    continue
-                if is_valid_float(val):
-                    # new_args.append(converted_float(val))
-                    arg_dict[key] = float(val)
-                    print("\t***DBG-valid float")
-                    continue
-                print("\tDBG-none of the above")
-                print()
+                if is_valid_integer(val):
+                    if is_valid_float(val):
+                        arg_dict[key] = float(val)  # test for leading minus
+                    else:
+                        arg_dict[key] = int(val)
+                else:
+                    if is_valid_string(val):  # not a number, valid string?
+                        arg_dict[key] = val.replace('_', ' ')
 
         # new object has already been created, now we pass new_args into
         # do_update repeatedly to modify newly created object
-        # print("----------DEBUG----------------")
-        # print(arg_dict)
-        # print(args[0])
-        # print(instance.id)
 
         for KV in arg_dict:
             #  build arg string
             params = " ".join([args[0], instance.id, KV, str(arg_dict[KV])])
+            print("---------PARAMS------------")
+            print(params)
+            print("---------------------------")
             self.do_update(params)
 
         print(instance.id)

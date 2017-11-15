@@ -4,8 +4,8 @@ from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.state import State
-from models.city import City
 from models.place import Place
+from models.city import City
 from models.amenity import Amenity
 from models.user import User
 from models.review import Review
@@ -20,7 +20,7 @@ class DBStorage:
 
     def __init__(self):
         """Initialize method"""
-        self.__engine = create_engine('mysql://{}:{}@{}/{}'
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(getenv('HBNB_MYSQL_USER'), 
                                               getenv('HBNB_MYSQL_PWD'),
                                               getenv('HBNB_MYSQL_HOST'), 

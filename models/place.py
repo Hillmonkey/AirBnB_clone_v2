@@ -1,6 +1,5 @@
 #!/usr/bin/python
 """ holds class Place"""
-import models
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from os import getenv
@@ -20,18 +19,18 @@ class Place(BaseModel):
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
     else:
-        city_id = ""
-        user_id = ""
-        name = ""
-        description = ""
-        number_rooms = 0
-        number_bathrooms = 0
-        max_guest = 0
-        price_by_night = 0
-        latitude = 0.0
-        longitude = 0.0
         amenity_ids = []
 
     def __init__(self, *args, **kwargs):
         """initializes Place"""
+        self.city_id = kwargs.pop('city_id', "")
+        self.user_id = kwargs.pop('user_id', "")
+        self.name = kwargs.pop('name', "")
+        self.description = kwargs.pop('description', "")
+        self.number_rooms = int(kwargs.pop('number_rooms', 0))
+        self.number_bathrooms = int(kwargs.pop('number_bathrooms', 0))
+        self.max_guest = int(kwargs.pop('max_guest', 0))
+        self.price_by_night = int(kwargs.pop('price_by_night', 0))
+        self.latitude = float(kwargs.pop('latitude', 0.0))
+        self.longitude = float(kwargs.pop('longitude', 0.0))
         super().__init__(*args, **kwargs)

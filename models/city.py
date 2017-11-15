@@ -1,6 +1,5 @@
 #!/usr/bin/python
 """ holds class City"""
-from models.place import Place
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
@@ -12,7 +11,7 @@ class City(BaseModel, Base):
         __tablename__ = "cities"
         state_id = Column(String(60), ForeignKey("states.id"))
         name = Column(String(128), nullable=False)
-        places = relationship("Place", backref="cities")
+   #     places = relationship('Place', backref="cities")
     else:
         name = ""
         state_id = ""

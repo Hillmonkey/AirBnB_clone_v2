@@ -1,20 +1,92 @@
 #!/usr/bin/python3
 """ console """
-
-import cmd
-from datetime import datetime
 import models
+import cmd
+from copy import deepcopy
+from datetime import datetime
 from models.amenity import Amenity
 from models.base_model import BaseModel
+from models.user import User
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
-from models.user import User
-from os import getenv
+
+import re
+import shlex  # for splitting the line along spaces except in double quotes
 
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
+
+
+def is_valid_string(string):
+    '''func: is fun
+    '''
+    # it seems that string is passed without surrounding quotes
+    # non-escaped internal quotes need to be tested
+    # no spaces in string
+    print("+++++++++++++ TESTING VALUE STRING +++++++++++++++++")
+    print("\t string = {}".format(string))
+    '''
+    if re.search(' ', string) is not None:
+        return False
+
+    # this doesnt test everything
+    if re.search("[a-zA-Z_]+", string) is not None:
+        return False
+    '''
+    return True
+
+
+def is_valid_key(string):
+    ''' func: is_valid_key
+    accepts: key
+    ........ not yet testing for edge cases like all underscores, other weird
+    ........ stuff
+    returns: boolean if string only contains alphanumberics
+    ........ and underscores (no spaces)
+    '''
+    # if re.search('[a-zA-Z_]+', string) is None:
+    # return False
+    # else:
+    # return True
+    return True
+
+
+def is_valid_integer(string):
+    ''' func: is_valid_integer
+    accepts: string
+    returns: boolean indicating if the string represents an integer
+    ........ leading or minus is allowed
+    '''
+    test_string = string
+    if len(string) > 0 and string[0] == "-":
+        test_string = string.replace('-', '', 1)
+    if test_string.isdigit():
+        return True
+    else:
+        return False
+
+
+def is_valid_float(string):
+    """func: is_valid_float
+    accepts: string
+    ........ test for int first, then for float
+    Return: True is string is a simple float"""
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+def converted_string(string):
+    '''func: converted_string
+    accepts: value in key/value pair where type(value) == str
+             leading and trailing quotes are already validated
+    returns: string with leading and trailing double quotes  stripped off
+    '''
+    return string[1:-1]
 
 
 class HBNBCommand(cmd.Cmd):
@@ -35,29 +107,69 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Creates a new instance of a class"""
-        kargs = {}
-        args = arg.split()
+        args = shlex.split(arg)
         if len(args) == 0:
             print("** class name missing **")
             return False
-        clname = args.pop(0)
-        for s in args:
-            s = s.split("=")
-            if len(s) == 2:
-                s[1] = s[1].replace('_', " ")
-                s[1] = s[1].replace('"', '')
-                kargs[s[0]] = s[1]
-        if clname in classes:
-            instance = classes[clname](**kargs)
+
+        if args[0] in classes:
+            instance = classes[args[0]]()
         else:
             print("** class doesn't exist **")
             return False
+
+        # here is where we handle passing params for object creation
+        # we will build new list of key-value pairs where all values
+        # values are validated
+        arg_dict = {}
+        print()
+        if len(args) > 1:
+            for arg in args[1:]:
+                # break key/value on equal sign
+                # Key must not contain an equal sign
+                print("DEBUG: {}".format(str(arg)))
+                key_val = arg.split('=')
+                key = key_val[0]
+                print("\tKEY: {}".format(key))
+                val = "".join(key_val[1:])
+                print("\tVALUE: {}".format(val))
+
+                #  validate key
+                if is_valid_key(key):
+                    print('\tKEY_IS_ALPHA')
+                else:
+                    print('\tKEY__NOT__ALPHA')
+                    continue
+
+                if "id" in key:  # all id keys have strings as values
+                    arg_dict[key] = val
+                    continue
+                if is_valid_integer(val):
+                    if is_valid_float(val):
+                        arg_dict[key] = float(val)  # test for leading minus
+                    else:
+                        arg_dict[key] = int(val)
+                else:
+                    if is_valid_string(val):  # not a number, valid string?
+                        arg_dict[key] = val.replace('_', ' ')
+
+        # new object has already been created, now we pass new_args into
+        # do_update repeatedly to modify newly created object
+
+        for KV in arg_dict:
+            #  build arg string
+            params = " ".join([args[0], instance.id, KV, str(arg_dict[KV])])
+            print("---------PARAMS------------")
+            print(params)
+            print("---------------------------")
+            self.do_update(params)
+
         print(instance.id)
         instance.save()
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
-        args = arg.split()
+        args = shlex.split(arg)
         if len(args) == 0:
             print("** class name missing **")
             return False
@@ -75,7 +187,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, arg):
         """Deletes an instance based on the class and id"""
-        args = arg.split()
+        args = shlex.split(arg)
         if len(args) == 0:
             print("** class name missing **")
         elif args[0] in classes:
@@ -93,9 +205,9 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Prints string representations of instances"""
-        args = arg.split()
+        args = shlex.split(arg)
         obj_list = []
-        if len(arg) == 0:
+        if len(args) == 0:
             for value in models.storage.all().values():
                 obj_list.append(str(value))
             print("[", end="")
@@ -113,7 +225,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Update an instance based on the class name, id, attribute & value"""
-        args = arg.split()
+        args = shlex.split(arg)
         integers = ["number_rooms", "number_bathrooms", "max_guest",
                     "price_by_night"]
         floats = ["latitude", "longitude"]

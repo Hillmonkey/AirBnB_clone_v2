@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 """ console """
-
+import models
 import cmd
 from copy import deepcopy
 from datetime import datetime
-import models
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City

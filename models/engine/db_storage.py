@@ -20,7 +20,7 @@ class DBStorage:
 
     def __init__(self):
         """Initialize method"""
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
+        self.__engine = create_engine('mysql://{}:{}@{}/{}'
                                       .format(getenv('HBNB_MYSQL_USER'), 
                                               getenv('HBNB_MYSQL_PWD'),
                                               getenv('HBNB_MYSQL_HOST'), 
@@ -58,7 +58,6 @@ class DBStorage:
     def reload(self):
         """creates all table in database and session"""
         Base.metadata.create_all(self.__engine)
-        self.__Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__Session = sessionmaker(bind=self.__engine, 
+                                      expire_on_commit=False)
         self.__session = scoped_session(self.__Session)
-
-        

@@ -1,12 +1,20 @@
 #!/usr/bin/python
 """ holds class City"""
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
+from os import getenv
 
-
-class City(BaseModel):
+class City(BaseModel, Base):
     """Representation of city """
-    state_id = ""
-    name = ""
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        __tablename__ = "cities"
+        state_id = Column(Integer, ForeignKey("states.id"))
+        name = Column(String(128), nullable=False)
+        places = relationship("Place", backref="cities")
+    else:
+        name = ""
+        state_id = ""
 
     def __init__(self, *args, **kwargs):
         """initializes city"""

@@ -15,7 +15,7 @@ if envstorage == "db":
                           Column("amenity_id", String(60), ForeignKey("amenities.id"),
                                  primary_key=True, nullable=False))
 
-class Place(BaseModel):
+class Place(BaseModel, Base):
     """Representation of Place """
     if envstorage  == "db":
         __tablename__ = "places"
@@ -29,7 +29,7 @@ class Place(BaseModel):
         price_by_night = Column(Integer, default=0, nullable=False)
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
-        reviews =  relationship("Review", cascade="all,delete", backref="user")
+        reviews =  relationship("Review", cascade="all,delete", backref="place")
         amenities = relationship("Amenity", secondary="place_amenity",
                                  backref="place_amenities", viewonly=False)
     else:

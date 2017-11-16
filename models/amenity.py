@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from os import getenv
 
 
-class Amenity(BaseModel):
+class Amenity(BaseModel, Base):
     """Representation of Amenity """
     if getenv("HBNB_TYPE_STORAGE") == "db":
         __tablename__ = 'amenities'

@@ -4,7 +4,7 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
 from os import getenv
 
-class Review(BaseModel):
+class Review(BaseModel, Base):
     """Representation of Review """
     if getenv("HBNB_TYPE_STORAGE") == "db":
         __tablename__ = "reviews"

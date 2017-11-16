@@ -50,7 +50,7 @@ class HBNBCommand(cmd.Cmd):
         if clname == "Place":
             tps = ("number_rooms", "number_bathrooms", "max_guest", "price_by_night")
             for key in kargs:
-                if key is in ("latitude", "longtitude"):
+                if key in ("latitude", "longtitude"):
                     try:
                         kargs[key] = float(kargs[key])
                     except ValueError:

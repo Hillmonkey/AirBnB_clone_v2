@@ -47,6 +47,19 @@ class HBNBCommand(cmd.Cmd):
                 s[1] = s[1].replace('_', " ")
                 s[1] = s[1].replace('"', '')
                 kargs[s[0]] = s[1]
+        if clname == "Place":
+            tps = ("number_rooms", "number_bathrooms", "max_guest", "price_by_night")
+            for key in kargs:
+                if key is in ("latitude", "longtitude"):
+                    try:
+                        kargs[key] = float(kargs[key])
+                    except ValueError:
+                        kargs.pop(key)
+                elif key in tps:
+                    if kargs[key].isdigit():
+                        kargs[key] = int(kargs[key])
+                    else:
+                        kargs.pop(key)
         if clname in classes:
             instance = classes[clname](**kargs)
         else:

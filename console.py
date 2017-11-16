@@ -12,6 +12,8 @@ from models.place import Place
 from models.amenity import Amenity
 from models.user import User
 from os import getenv
+from shlex import split as spliter
+
 
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
@@ -36,21 +38,22 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, arg):
         """Creates a new instance of a class"""
         kargs = {}
-        args = arg.split()
+        args = spliter(arg)
         if len(args) == 0:
             print("** class name missing **")
             return False
         clname = args.pop(0)
         for s in args:
             s = s.split("=")
-            if len(s) == 2:
+            if len(s) == 2 and ' ' not in s[1]:
                 s[1] = s[1].replace('_', " ")
                 s[1] = s[1].replace('"', '')
                 kargs[s[0]] = s[1]
         if clname == "Place":
             tps = ("number_rooms", "number_bathrooms",
                    "max_guest", "price_by_night")
-            for key in kargs:
+            cpkargs = kargs.copy()
+            for key in cpkargs:
                 if key in ("latitude", "longtitude"):
                     try:
                         kargs[key] = float(kargs[key])
@@ -61,6 +64,9 @@ class HBNBCommand(cmd.Cmd):
                         kargs[key] = int(kargs[key])
                     else:
                         kargs.pop(key)
+        print(kargs)
+        for key in kargs:
+            print(type(kargs[key]))
         if clname in classes:
             instance = classes[clname](**kargs)
         else:
@@ -71,7 +77,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
-        args = arg.split()
+        args = spliter(arg)
         if len(args) == 0:
             print("** class name missing **")
             return False
@@ -89,7 +95,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, arg):
         """Deletes an instance based on the class and id"""
-        args = arg.split()
+        args = spliter(arg)
         if len(args) == 0:
             print("** class name missing **")
         elif args[0] in classes:
@@ -107,7 +113,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Prints string representations of instances"""
-        args = arg.split()
+        args = spliter(arg)
         obj_list = []
         if len(arg) == 0:
             for value in models.storage.all().values():
@@ -127,7 +133,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Update an instance based on the class name, id, attribute & value"""
-        args = arg.split()
+        args = spliter(arg)
         integers = ["number_rooms", "number_bathrooms", "max_guest",
                     "price_by_night"]
         floats = ["latitude", "longitude"]

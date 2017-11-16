@@ -6,6 +6,12 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
 
+place_amenity = Table('place_amenity', Base.metadata, 
+                      Column('place_id', String(60), ForeignKey('places.id'),
+                             primary_key=True, nullable=False),
+                      Column('amenity_id', String(60), ForeignKey('amenities.id'),
+                             primary_key=True, nullable=False))
+
 class Place(BaseModel):
     """Representation of Place """
     if getenv("HBNB_TYPE_STORAGE") == "db":
@@ -21,6 +27,7 @@ class Place(BaseModel):
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
         reviews =  relationship("Review", cascade="all,delete", backref="user")
+        amenities = relationship('Amenity', secondary='place_amenity', viewonly=False)
     else:
         amenity_ids = []
 
@@ -33,6 +40,18 @@ class Place(BaseModel):
                 if objs[key].place_id == self.id:
                     cities.append(objs[key])
             return reviews
+
+
+        @property
+        def amenities(self):
+            """returns Cities instances of current state_id"""
+            amenities = []
+            objs = models.storage.all(models.amenity.Amenity)
+            for key in objs:
+                if objs[key].place_id == self.id:
+                    amenities.append(objs[key])
+            return amenities
+
 
     def __init__(self, *args, **kwargs):
         """initializes Place"""

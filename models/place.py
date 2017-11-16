@@ -2,7 +2,7 @@
 """ holds class Place"""
 from models.base_model import BaseModel, Base
 import  models
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -53,16 +53,16 @@ class Place(BaseModel):
             return amenities
 
 
-    def __init__(self, *args, **kwargs):
-        """initializes Place"""
-        self.city_id = kwargs.pop('city_id', "")
-        self.user_id = kwargs.pop('user_id', "")
-        self.name = kwargs.pop('name', "")
-        self.description = kwargs.pop('description', "")
-        self.number_rooms = int(kwargs.pop('number_rooms', 0))
-        self.number_bathrooms = int(kwargs.pop('number_bathrooms', 0))
-        self.max_guest = int(kwargs.pop('max_guest', 0))
-        self.price_by_night = int(kwargs.pop('price_by_night', 0))
-        self.latitude = float(kwargs.pop('latitude', 0.0))
-        self.longitude = float(kwargs.pop('longitude', 0.0))
-        super().__init__(*args, **kwargs)
+            def __init__(self, *args, **kwargs):
+                """initializes Place"""
+                self.city_id = kwargs.pop('city_id', "")
+                self.user_id = kwargs.pop('user_id', "")
+                self.name = kwargs.pop('name', "")
+                self.description = kwargs.pop('description', "")
+                self.number_rooms = int(kwargs.pop('number_rooms', 0))
+                self.number_bathrooms = int(kwargs.pop('number_bathrooms', 0))
+                self.max_guest = int(kwargs.pop('max_guest', 0))
+                self.price_by_night = int(kwargs.pop('price_by_night', 0))
+                self.latitude = float(kwargs.pop('latitude', 0.0))
+                self.longitude = float(kwargs.pop('longitude', 0.0))
+                super().__init__(*args, **kwargs)

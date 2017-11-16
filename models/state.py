@@ -15,9 +15,9 @@ class State(BaseModel, Base):
     else:
         name = ""
 
-    def __init__(self, *args, **kwargs):
-        """initializes state"""
-        super().__init__(*args, **kwargs)
+        def __init__(self, *args, **kwargs):
+            """initializes state"""
+            super().__init__(*args, **kwargs)
         
     @property
     def cities(self):

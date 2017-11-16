@@ -1,7 +1,9 @@
 #!/usr/bin/python
 """ holds class Place"""
 from models.base_model import BaseModel, Base
+import  models
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import relationship
 from os import getenv
 
 class Place(BaseModel):
@@ -18,8 +20,19 @@ class Place(BaseModel):
         price_by_night = Column(Integer, default=0, nullable=False)
         latitude = Column(Float, nullable=False)
         longitude = Column(Float, nullable=False)
+        reviews =  relationship("Review", cascade="all,delete", backref="user")
     else:
         amenity_ids = []
+
+        @property
+        def reviews(self):
+            """returns Cities instances of current state_id"""
+            reviews = []
+            objs = models.storage.all(models.review.Review)
+            for key in objs:
+                if objs[key].place_id == self.id:
+                    cities.append(objs[key])
+            return reviews
 
     def __init__(self, *args, **kwargs):
         """initializes Place"""

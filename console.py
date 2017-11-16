@@ -48,7 +48,8 @@ class HBNBCommand(cmd.Cmd):
                 s[1] = s[1].replace('"', '')
                 kargs[s[0]] = s[1]
         if clname == "Place":
-            tps = ("number_rooms", "number_bathrooms", "max_guest", "price_by_night")
+            tps = ("number_rooms", "number_bathrooms",
+                   "max_guest", "price_by_night")
             for key in kargs:
                 if key in ("latitude", "longtitude"):
                     try:

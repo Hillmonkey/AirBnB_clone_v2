@@ -12,19 +12,18 @@ from models.place import Place
 from models.review import Review
 
 
-
 class DBStorage:
     """DBStorage class"""
     __engine = None
     __session = None
-    types = [User, State, City] # Amenity, Place, Review]
+    types = [User, State, City, Amenity, Place, Review]
 
     def __init__(self):
         """Initialize method"""
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(getenv('HBNB_MYSQL_USER'), 
+                                      .format(getenv('HBNB_MYSQL_USER'),
                                               getenv('HBNB_MYSQL_PWD'),
-                                              getenv('HBNB_MYSQL_HOST'), 
+                                              getenv('HBNB_MYSQL_HOST'),
                                               getenv('HBNB_MYSQL_DB')))
         if getenv('HBNB_MYSQL_ENV') == "test":
             Base.metadata.drop_all(self.__engine)
@@ -59,6 +58,6 @@ class DBStorage:
     def reload(self):
         """creates all table in database and session"""
         Base.metadata.create_all(self.__engine)
-        Session = sessionmaker(bind=self.__engine, 
-                                      expire_on_commit=False)
+        Session = sessionmaker(bind=self.__engine,
+                               expire_on_commit=False)
         self.__session = scoped_session(Session)

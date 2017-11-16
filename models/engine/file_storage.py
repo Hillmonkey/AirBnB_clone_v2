@@ -12,6 +12,7 @@ from models.review import Review
 from models.user import User
 from models.amenity import Amenity
 
+
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
 
@@ -58,6 +59,7 @@ class FileStorage:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
         except:
             pass
+
     def delete(self, obj=None):
         """delete method"""
         if obj is not None:

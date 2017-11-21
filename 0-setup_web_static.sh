@@ -13,5 +13,5 @@ sudo ln --force -s -T /data/web_static/releases/test /data/web_static/current
 sudo chown -R ubuntu:ubuntu /data/
 sudo rm /etc/nginx/site-available/default
 wget https://raw.githubusercontent.com/Hillmonkey/AirBnB_clone_v2/master/default
-sudo mv default /etc/nginx/sites-available/default
+sudo cp default /etc/nginx/sites-available/default
 sudo service nginx restart

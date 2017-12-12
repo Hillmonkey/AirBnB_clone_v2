@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test BaseModel for expected behavior and documentation"""
 from datetime import datetime
-import os  # import getenv, setenv
+import os  # import getenv, setenv, environ
 import inspect
 import models
 import pep8 as pycodestyle
@@ -59,9 +59,13 @@ class TestBaseModelDocs(unittest.TestCase):
                     "{:s} method needs a docstring".format(func[0])
                 )
 
+'''
+@unittest.skipIf(os.getenv("HBNB_TYPE_STORAGE") is None or
+                 os.getenv("HBNB_TYPE_STORAGE") is not "file",
+                 "skipping tests not designed for file storage")
+'''
 
-@unittest.skipIf(os.getenv(HBNB_TYPE_STORAGE) is None or
-                 getenv(HBNB_TYPE_STORAGE) is not "db")
+
 class TestBaseModel(unittest.TestCase):
     """Test the BaseModel class"""
     @mock.patch('models.storage')

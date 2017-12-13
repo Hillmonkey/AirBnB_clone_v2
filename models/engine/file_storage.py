@@ -60,6 +60,10 @@ class FileStorage:
         except:
             pass
 
+	def close(self):
+		'''deserialize JSON file to objects'''
+		self.reload(self)
+
     def delete(self, obj=None):
         """delete method"""
         if obj is not None:

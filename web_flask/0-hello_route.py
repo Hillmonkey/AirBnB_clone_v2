@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+'''module: 0-hello_route
+demonstrating basic flask functionality '''
 from flask import Flask
 app = Flask(__name__)
 
@@ -6,4 +9,5 @@ app = Flask(__name__)
 def hello_hbnb():
     return 'Hello, HBNB!'
 
-print("testing, testing. main main main")
+if __name__ == '__main__':
+    app.run()

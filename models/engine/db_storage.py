@@ -42,6 +42,9 @@ class DBStorage:
                 _dict[key] = obj
         return _dict
 
+	def close(self):
+		''' does something'''
+
     def new(self, obj):
         """adds an object"""
         self.__session.add(obj)

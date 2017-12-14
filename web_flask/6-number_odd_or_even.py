@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''module: 0-hello_route
+'''module: 6-number_odd_or_even
 demonstrating basic flask functionality '''
 from flask import Flask
 from flask import render_template
